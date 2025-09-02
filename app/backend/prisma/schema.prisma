@@ -1,0 +1,316 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(USUARIO)
+  isActive     Boolean  @default(true)
+  assignedAmbulanceId String?
+  assignedAmbulance   Ambulance? @relation(fields: [assignedAmbulanceId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  checklists   Checklist[]
+  incidents    Incident[] @relation("IncidentResponsible")
+  auditLogs    AuditLog[]
+  
+  @@map("users")
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  COORDINADOR
+  USUARIO
+  AUDITOR
+  SOLO_LECTURA
+}
+
+model Ambulance {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  plate     String   @unique
+  model     String?
+  year      Int?
+  type      AmbulanceType @default(SVB)
+  status    String   @default("OK")
+  lastMechanicalReview DateTime?
+  lastCleaning DateTime?
+  lastInventoryCheck DateTime?
+  lastDailyCheck DateTime?
+  lastKnownKilometers Int?
+  lastCheckInByUserId String?
+  lastCheckInDate DateTime?
+  dailyCheckCompleted Boolean @default(false)
+  mechanicalReviewCompleted Boolean @default(false)
+  cleaningCompleted Boolean @default(false)
+  inventoryCompleted Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  assignedUsers User[]
+  inventoryItems InventoryItem[]
+  checklists     Checklist[]
+  incidents      Incident[]
+  
+  @@map("ambulances")
+}
+
+enum AmbulanceType {
+  SVB
+  SVA
+  A1
+  A2
+}
+
+model MaterialCategory {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  color     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  // Relations
+  materials Material[]
+  
+  @@map("material_categories")
+}
+
+model Material {
+  id           String  @id @default(cuid())
+  name         String
+  unit         String?
+  critical     Boolean @default(false)
+  categoryId   String?
+  category     MaterialCategory? @relation(fields: [categoryId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  items        InventoryItem[]
+  
+  @@map("materials")
+}
+
+model InventoryItem {
+  id           String   @id @default(cuid())
+  ambulanceId  String
+  ambulance    Ambulance @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
+  materialId   String
+  material     Material @relation(fields: [materialId], references: [id])
+  batch        String?
+  qty          Int      @default(0)
+  location     String?
+  minStock     Int      @default(0)
+  expiryDate   DateTime?
+  status       String   @default("OK") // OK | EXPIRED | LOW
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  logs         InventoryLog[]
+  incidents    Incident[]
+  
+  @@map("inventory_items")
+}
+
+model InventoryLog {
+  id            String   @id @default(cuid())
+  inventoryItemId String
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  diff          Int
+  reason        String
+  userId        String?
+  createdAt     DateTime @default(now())
+  
+  @@map("inventory_logs")
+}
+
+model ChecklistTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  periodicity String // DAILY | WEEKLY | MONTHLY
+  active      Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  items       ChecklistItem[]
+  checklists  Checklist[]
+  
+  @@map("checklist_templates")
+}
+
+model ChecklistItem {
+  id          String @id @default(cuid())
+  templateId  String
+  template    ChecklistTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  label       String
+  type        String // OKKO | NUMBER | TEXT | ATTACH
+  required    Boolean @default(false)
+  "order"     Int     @default(0)
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  responses   ChecklistResponse[]
+  
+  @@map("checklist_items")
+}
+
+model Checklist {
+  id           String @id @default(cuid())
+  ambulanceId  String
+  ambulance    Ambulance @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
+  templateId   String
+  template     ChecklistTemplate @relation(fields: [templateId], references: [id])
+  userId       String
+  user         User @relation(fields: [userId], references: [id])
+  date         DateTime @default(now())
+  status       String   @default("DONE") // DONE | IN_PROGRESS | FAILED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  responses    ChecklistResponse[]
+  
+  @@map("checklists")
+}
+
+model ChecklistResponse {
+  id           String @id @default(cuid())
+  checklistId  String
+  checklist    Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  itemId       String
+  item         ChecklistItem @relation(fields: [itemId], references: [id])
+  valueText    String?
+  valueNumber  Float?
+  valueBool    Boolean?
+  attachmentUrl String?
+  issue        Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("checklist_responses")
+}
+
+model Incident {
+  id             String  @id @default(cuid())
+  ambulanceId    String
+  ambulance      Ambulance @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
+  inventoryItemId String?
+  inventoryItem  InventoryItem? @relation(fields: [inventoryItemId], references: [id])
+  type           String // MISSING | EXPIRED | DAMAGE | MAINTENANCE
+  severity       String // LOW | MEDIUM | HIGH | CRITICAL
+  title          String
+  description    String?
+  status         String @default("OPEN") // OPEN | IN_PROGRESS | RESOLVED | CLOSED
+  responsibleId  String?
+  responsible    User? @relation("IncidentResponsible", fields: [responsibleId], references: [id])
+  dueDate        DateTime?
+  resolvedAt     DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@map("incidents")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  action    String   // CREATE | UPDATE | DELETE | LOGIN | LOGOUT
+  tableName String
+  recordId  String?
+  payload   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  
+  @@map("audit_logs")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String   // EMAIL | PUSH | IN_APP
+  title     String
+  message   String
+  data      Json?
+  sent      Boolean  @default(false)
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+  
+  @@map("notifications")
+}
+
+model Space {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("spaces")
+}
+
+model AmpularioMaterial {
+  id           String   @id @default(cuid())
+  spaceId      String
+  space        Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  name         String
+  dose         String?
+  unit         String?
+  quantity     Int      @default(0)
+  route        String   // IV/IM | Nebulizador | Oral
+  expiryDate   DateTime?
+  minStockLevel Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("ampulario_materials")
+}
+
+model USVBKit {
+  id        String   @id @default(cuid())
+  number    Int      @unique
+  name      String
+  iconName  String
+  genericImageHint String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  materials USVBKitMaterial[]
+  
+  @@map("usvb_kits")
+}
+
+model USVBKitMaterial {
+  id           String  @id @default(cuid())
+  kitId        String
+  kit          USVBKit @relation(fields: [kitId], references: [id], onDelete: Cascade)
+  name         String
+  quantity     Int     @default(0)
+  targetQuantity Int   @default(0)
+  status       String? // ok | low | out
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("usvb_kit_materials")
+}

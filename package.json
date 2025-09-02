@@ -1,0 +1,32 @@
+{
+  "name": "ambureview-mvp",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de ambulancias - MVP Production Ready",
+  "private": true,
+  "workspaces": [
+    "app/backend",
+    "app/frontend"
+  ],
+  "scripts": {
+    "dev": "docker-compose up -d db mailhog && concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd app/backend && npm run start:dev",
+    "dev:frontend": "cd app/frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd app/backend && npm run build",
+    "build:frontend": "cd app/frontend && npm run build",
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd app/backend && npm run test",
+    "test:frontend": "cd app/frontend && npm run test",
+    "db:migrate": "cd app/backend && npx prisma migrate deploy",
+    "db:seed": "cd app/backend && npx prisma db seed",
+    "db:reset": "cd app/backend && npx prisma migrate reset --force",
+    "db:studio": "cd app/backend && npx prisma studio",
+    "backup": "docker-compose exec backup /backup.sh",
+    "restore": "docker-compose exec backup /restore.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
