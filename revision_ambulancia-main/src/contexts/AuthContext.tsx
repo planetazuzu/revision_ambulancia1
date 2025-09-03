@@ -1,100 +1,69 @@
 
 "use client";
 
-import type { User, Ambulance } from '@/types';
+import type { User } from '@/types';
 import { useRouter, usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
-import { initialAmbulances } from './AppDataContext'; // Assuming initialAmbulances is exported
+import { useAuth as useAuthHook } from '@/hooks/useAuth';
+import type { LoginRequest } from '@/lib/services';
 
 
 interface AuthContextType {
   user: User | null;
-  login: (name: string) => void;
-  logout: () => void;
+  login: (credentials: LoginRequest) => Promise<void>;
+  logout: () => Promise<void>;
   loading: boolean;
+  error: string | null;
   assignAmbulanceToCurrentUser: (ambulanceId: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const mockUsers: User[] = [
-  { id: 'userCoordinador', name: 'Alicia Coordinadora', role: 'coordinador' },
-  { id: 'amb001user', name: 'Ambulancia 01', role: 'usuario' }, // This user's name matches an ambulance name
-  { id: 'userGenerico', name: 'Carlos Usuario', role: 'usuario' },
-];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, login: loginHook, logout: logoutHook, error } = useAuthHook();
   const router = useRouter();
   const currentPathname = usePathname();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('ambuReviewUser');
-    if (storedUser) {
-      const parsedUser: User = JSON.parse(storedUser);
-      setUser(parsedUser);
-      // Redirect if user needs validation but isn't on validation page
-      if (parsedUser.role === 'usuario' && !parsedUser.assignedAmbulanceId && currentPathname !== '/validate-ambulance' && currentPathname !== '/') {
-         router.replace('/validate-ambulance');
+    // Redirect logic based on user state
+    if (!loading && user) {
+      if (user.role === 'usuario' && !user.assignedAmbulanceId && currentPathname !== '/validate-ambulance' && currentPathname !== '/') {
+        router.replace('/validate-ambulance');
       }
     }
-    setLoading(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount, redirection logic inside login or main layout now
+  }, [user, loading, currentPathname, router]);
 
-
-  const login = (name: string) => {
-    setLoading(true);
-    let loggedInUser: User | undefined = mockUsers.find(u => u.name.toLowerCase() === name.toLowerCase());
-    
-    if (!loggedInUser) {
-      loggedInUser = { id: `user-${Date.now()}`, name: name || "Usuario Invitado", role: 'usuario' };
+  const login = async (credentials: LoginRequest) => {
+    try {
+      await loginHook(credentials);
+    } catch (err) {
+      // Error is handled by the hook
+      throw err;
     }
-
-    const tempUser = {...loggedInUser}; // Create a mutable copy
-
-    if (tempUser.role === 'usuario') {
-      const assignedAmbulance = initialAmbulances.find(
-        (amb: Ambulance) => amb.name.toLowerCase() === tempUser.name.toLowerCase()
-      );
-      if (assignedAmbulance) {
-        tempUser.assignedAmbulanceId = assignedAmbulance.id;
-      } else {
-        delete tempUser.assignedAmbulanceId; 
-      }
-    } else {
-        delete tempUser.assignedAmbulanceId;
-    }
-    
-    setUser(tempUser);
-    localStorage.setItem('ambuReviewUser', JSON.stringify(tempUser));
-
-    if (tempUser.role === 'usuario' && !tempUser.assignedAmbulanceId) {
-      router.push('/validate-ambulance');
-    } else {
-      router.push('/dashboard');
-    }
-    setLoading(false);
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('ambuReviewUser');
-    router.push('/');
+  const logout = async () => {
+    try {
+      await logoutHook();
+    } catch (err) {
+      // Error is handled by the hook
+      console.error('Logout error:', err);
+    }
   };
 
   const assignAmbulanceToCurrentUser = (ambulanceId: string) => {
     if (user && user.role === 'usuario') {
+      // This would need to be implemented in the backend
+      // For now, we'll just update the local state
       const updatedUser = { ...user, assignedAmbulanceId: ambulanceId };
-      setUser(updatedUser);
-      localStorage.setItem('ambuReviewUser', JSON.stringify(updatedUser));
+      // Note: This should be updated via API call to the backend
+      console.log('Assign ambulance to user:', ambulanceId);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, assignAmbulanceToCurrentUser }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, error, assignAmbulanceToCurrentUser }}>
       {children}
     </AuthContext.Provider>
   );

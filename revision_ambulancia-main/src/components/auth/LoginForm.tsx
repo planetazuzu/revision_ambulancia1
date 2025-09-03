@@ -10,20 +10,33 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ArrowRight, LogIn } from 'lucide-react'; // Added LogIn for main button
 
 export default function LoginForm() {
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(name);
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await login({ email, password });
+    } catch (err: any) {
+      setError(err.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleTestUserLogin = (testUser: string) => {
-    // Optionally pre-fill fields for visual feedback, then log in
-    setName(testUser);
-    setPassword("123456"); // Mock password as in the image's help text
-    login(testUser);
+  const handleTestUserLogin = (testEmail: string) => {
+    setEmail(testEmail);
+    setPassword("123456"); // Mock password
+    // Auto-submit after setting values
+    setTimeout(() => {
+      handleSubmit(new Event('submit') as any);
+    }, 100);
   }
 
   return (
@@ -35,14 +48,20 @@ export default function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+              {error}
+            </div>
+          )}
           <div className="space-y-2">
-            <Label htmlFor="name">Usuario</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="name"
-              placeholder="Introduce tu usuario" // Cambiado de "ej. Alicia Coordinadora..."
+              id="email"
+              type="email"
+              placeholder="ej. alicia@ambureview.com"
               required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -61,9 +80,9 @@ export default function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={loading}>
             <LogIn className="mr-2 h-4 w-4" />
-            Iniciar sesión
+            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </Button>
         </form>
       </CardContent>
@@ -76,16 +95,22 @@ export default function LoginForm() {
         </div>
 
         <div className="w-full pt-4">
-          <p className="text-center text-xs text-muted-foreground mb-3">Cuentas de prueba (contraseña simulada)</p>
+          <p className="text-center text-xs text-muted-foreground mb-3">Cuentas de prueba (contraseña: 123456)</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {(['Alicia Coordinadora', 'Ambulancia 01', 'Carlos Usuario'] as const).map((userType) => (
+            {([
+              { name: 'Alicia Coordinadora', email: 'alicia@ambureview.com' },
+              { name: 'Ambulancia 01', email: 'amb001@ambureview.com' },
+              { name: 'Carlos Usuario', email: 'carlos@ambureview.com' },
+              { name: 'Admin Sistema', email: 'admin@ambureview.com' }
+            ] as const).map((user) => (
               <Button
-                key={userType}
+                key={user.email}
                 variant="outline"
                 className="w-full justify-between"
-                onClick={() => handleTestUserLogin(userType)}
+                onClick={() => handleTestUserLogin(user.email)}
+                disabled={loading}
               >
-                {userType}
+                {user.name}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             ))}

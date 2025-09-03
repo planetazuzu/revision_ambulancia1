@@ -1,5 +1,6 @@
 
 import LoginForm from '@/components/auth/LoginForm';
+import { AuthModeInfo, BackendModeInfo } from '@/components/shared/AuthModeInfo';
 import { Ambulance } from 'lucide-react'; // Importa el icono
 
 export default function LoginPage() {
@@ -9,7 +10,9 @@ export default function LoginPage() {
       <div className="mb-8">
         <Ambulance className="h-16 w-16 text-primary" />
       </div>
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md space-y-6">
+        <AuthModeInfo />
+        <BackendModeInfo />
         <LoginForm />
       </div>
     </main>
