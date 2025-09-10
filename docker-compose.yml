@@ -75,16 +75,17 @@ services:
       - "1025:1025"
     restart: unless-stopped
 
-  cron:
-    image: ghcr.io/aptible/supercronic:latest
-    command: ["/etc/crontab"]
-    volumes:
-      - ./ops/crontab:/etc/crontab:ro
-    env_file:
-      - .env
-    depends_on:
-      - backend
-    restart: unless-stopped
+  # cron service commented out temporarily due to image access issues
+  # cron:
+  #   image: ghcr.io/aptible/supercronic:latest
+  #   command: ["/etc/crontab"]
+  #   volumes:
+  #     - ./ops/crontab:/etc/crontab:ro
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
 
   backup:
     image: prodrigestivill/postgres-backup-local:16

@@ -6,13 +6,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+COPY package.json ./
+RUN npm install --omit=dev
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+COPY package.json ./
+RUN npm install
 COPY . .
 
 # Generate Prisma client
@@ -25,7 +26,7 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
@@ -47,6 +48,6 @@ USER nestjs
 
 EXPOSE 3001
 
-ENV PORT 3001
+ENV PORT=3001
 
 CMD ["sh", "start.sh"]
