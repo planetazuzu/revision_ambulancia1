@@ -44,6 +44,37 @@ Sistema completo de gestión y revisión de ambulancias con backend NestJS, fron
 - Backup automático
 - Docker containerizado
 
+## 🚀 Despliegue Rápido
+
+### Opción 1: Script Automático (Ubuntu)
+```bash
+# Clonar repositorio
+git clone https://github.com/planetazuzu/revision_ambulancia1.git
+cd revision_ambulancia1
+
+# Ejecutar instalador automático
+chmod +x ubuntu-deploy.sh
+sudo ./ubuntu-deploy.sh
+```
+
+### Opción 2: Docker Compose
+```bash
+# Clonar y configurar
+git clone https://github.com/planetazuzu/revision_ambulancia1.git
+cd revision_ambulancia1
+cp env.example .env
+nano .env  # Configurar variables
+
+# Desplegar
+chmod +x deploy-fix.sh
+./deploy-fix.sh
+```
+
+📚 **Documentación de Despliegue:**
+- [Guía Ubuntu Completa](./GUIA_DESPLIEGUE_UBUNTU.md)
+- [Guía de Despliegue General](./GUIA_DESPLIEGUE.md)
+- [Changelog de Correcciones](./CHANGELOG_FIXES.md)
+
 ## 🏗️ Arquitectura
 
 ```
