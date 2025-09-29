@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16
@@ -76,7 +74,7 @@ services:
     restart: unless-stopped
 
   cron:
-    image: ghcr.io/aptible/supercronic:latest
+    image: aptible/supercronic:latest
     command: ["/etc/crontab"]
     volumes:
       - ./ops/crontab:/etc/crontab:ro
