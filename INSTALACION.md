@@ -22,6 +22,18 @@ deploy.bat
 ./deploy.sh
 ```
 
+### **Opción 1.1: Con Docker - Puertos Personalizados**
+
+#### Para evitar conflictos de puertos:
+```bash
+# Backend en puerto 9990, Frontend en puerto 3001
+# En Windows:
+deploy-port9990-3001.bat
+
+# En Linux/macOS:
+./deploy-port9990-3001.sh
+```
+
 ### **Opción 2: Sin Docker (Desarrollo Local)**
 
 #### Prerrequisitos:
@@ -41,6 +53,18 @@ start-local.bat
 
 # En Linux/macOS:
 ./start-local.sh
+```
+
+### **Opción 2.1: Sin Docker - Puertos Personalizados**
+
+#### Para evitar conflictos de puertos:
+```bash
+# Backend en puerto 9990, Frontend en puerto 3001
+# En Windows:
+start-local-port9990-3001.bat
+
+# En Linux/macOS:
+./start-local-port9990-3001.sh
 ```
 
 ### **Opción 3: Instalación Manual**
