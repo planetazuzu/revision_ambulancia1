@@ -1,0 +1,36 @@
+# Dockerfile simplificado - Todo en uno
+FROM node:18-alpine
+
+# Instalar dependencias del sistema
+RUN apk add --no-cache \
+    sqlite3 \
+    curl \
+    bash
+
+# Crear directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de configuración
+COPY package*.json ./
+COPY .env.simple .env
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar código de la aplicación
+COPY . .
+
+# Crear directorio para base de datos
+RUN mkdir -p /app/data
+
+# Configurar base de datos SQLite
+RUN sqlite3 /app/data/ambureview.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, password TEXT, role TEXT);"
+
+# Exponer puertos
+EXPOSE 3000 3001
+
+# Script de inicio
+COPY start-simple.sh /start-simple.sh
+RUN chmod +x /start-simple.sh
+
+CMD ["/start-simple.sh"]

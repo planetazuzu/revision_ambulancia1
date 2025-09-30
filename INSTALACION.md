@@ -2,7 +2,41 @@
 
 ## 📋 Opciones de Instalación
 
-### **Opción 1: Con Docker (Recomendado para Producción)**
+### **Opción 1: Despliegue Simplificado (Recomendado)**
+
+#### **🚀 Un Solo Contenedor - Todo Incluido**
+
+Esta es la opción más fácil y rápida. Incluye frontend, backend y base de datos en un solo contenedor.
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/planetazuzu/revision_ambulancia1.git
+cd revision_ambulancia1
+
+# 2. Ejecutar despliegue simplificado
+# En Windows:
+deploy-simple.bat
+
+# En Linux/macOS:
+./deploy-simple.sh
+```
+
+#### **✅ Ventajas del Despliegue Simplificado:**
+- ✅ **Un solo comando** - Todo se instala automáticamente
+- ✅ **Base de datos integrada** - SQLite embebido, sin configuración
+- ✅ **Sin dependencias externas** - No necesita PostgreSQL ni Redis
+- ✅ **Datos de prueba incluidos** - Usuarios y ambulancias precargados
+- ✅ **Fácil mantenimiento** - Un solo contenedor para todo
+- ✅ **Puertos estándar** - 3000 (Frontend) y 3001 (Backend)
+
+#### **🔧 Características Técnicas:**
+- **Frontend**: Aplicación web moderna con HTML5, CSS3 y JavaScript
+- **Backend**: Servidor Express.js con API REST
+- **Base de datos**: SQLite embebido (archivo `./data/ambureview.db`)
+- **Puertos**: 3000 (Frontend), 3001 (Backend API)
+- **Persistencia**: Los datos se guardan en el directorio `./data/`
+
+### **Opción 2: Con Docker (Producción Avanzada)**
 
 #### Prerrequisitos:
 - Docker Desktop instalado
@@ -88,9 +122,14 @@ npm run dev
 
 ## 🌐 Acceso a la Aplicación
 
-Una vez instalada, accede a:
+### **Despliegue Simplificado:**
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:3001
+- **Base de datos:** SQLite en `./data/ambureview.db`
+
+### **Despliegue Completo:**
+- **Frontend:** http://localhost:3000 (o 3001 con puertos personalizados)
+- **Backend API:** http://localhost:3001 (o 9990 con puertos personalizados)
 - **API Docs:** http://localhost:3001/api
 - **MailHog:** http://localhost:8025 (solo con Docker)
 
