@@ -15,7 +15,7 @@ export class AmpularioService {
       data: createSpaceDto,
       include: {
         _count: {
-          select: { ampularioMaterials: true }
+          select: { materials: true }
         }
       }
     });
@@ -25,7 +25,7 @@ export class AmpularioService {
     return this.prisma.space.findMany({
       include: {
         _count: {
-          select: { ampularioMaterials: true }
+          select: { materials: true }
         }
       },
       orderBy: { name: 'asc' }
@@ -36,7 +36,7 @@ export class AmpularioService {
     const space = await this.prisma.space.findUnique({
       where: { id },
       include: {
-        ampularioMaterials: {
+        materials: {
           orderBy: { name: 'asc' }
         }
       }
@@ -57,7 +57,7 @@ export class AmpularioService {
       data: updateSpaceDto,
       include: {
         _count: {
-          select: { ampularioMaterials: true }
+          select: { materials: true }
         }
       }
     });

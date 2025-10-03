@@ -207,6 +207,7 @@ model ChecklistResponse {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
+  @@unique([checklistId, itemId])
   @@map("checklist_responses")
 }
 

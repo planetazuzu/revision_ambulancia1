@@ -162,7 +162,7 @@ export class AmbulancesService {
         action: 'UPDATE',
         tableName: 'Ambulance',
         recordId: ambulance.id,
-        payload: updateAmbulanceDto,
+        payload: updateAmbulanceDto as any,
       },
     });
 

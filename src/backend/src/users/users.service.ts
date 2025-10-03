@@ -109,7 +109,7 @@ export class UsersService {
         action: 'UPDATE',
         tableName: 'User',
         recordId: user.id,
-        payload: updateUserDto,
+        payload: updateUserDto as any,
       },
     });
 

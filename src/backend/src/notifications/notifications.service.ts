@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
-import { WebSocketGateway } from '../websocket/websocket.gateway';
+import { AmbuReviewWebSocketGateway } from '../websocket/websocket.gateway';
 import * as nodemailer from 'nodemailer';
 import * as webpush from 'web-push';
 
@@ -12,14 +12,14 @@ export class NotificationsService {
   constructor(
     private configService: ConfigService,
     private prisma: PrismaService,
-    private webSocketGateway: WebSocketGateway,
+    private webSocketGateway: AmbuReviewWebSocketGateway,
   ) {
     this.initializeEmail();
     this.initializeWebPush();
   }
 
   private initializeEmail() {
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: this.configService.get<string>('SMTP_HOST'),
       port: parseInt(this.configService.get<string>('SMTP_PORT', '1025')),
       secure: false,
