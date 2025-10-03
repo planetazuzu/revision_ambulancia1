@@ -60,8 +60,8 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.BACKEND_PORT || 3001;
-const FRONTEND_PORT = process.env.FRONTEND_PORT || 3000;
+const PORT = process.env.BACKEND_PORT || 9990;
+const FRONTEND_PORT = process.env.FRONTEND_PORT || 3001;
 
 // Middleware
 app.use(cors());

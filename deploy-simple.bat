@@ -39,8 +39,8 @@ echo.
 echo [5] Ejecutando contenedor...
 docker run -d \
   --name ambureview-simple \
-  -p 3000:3000 \
   -p 3001:3001 \
+  -p 9990:9990 \
   -v "%cd%\data:/app/data" \
   ambureview-simple
 echo ✅ Contenedor ejecutandose
@@ -56,7 +56,7 @@ echo.
 
 echo [8] Probando conectividad...
 echo Probando backend...
-curl -f http://localhost:3001/health 2>nul
+curl -f http://localhost:9990/health 2>nul
 if %errorlevel% equ 0 (
     echo ✅ Backend funcionando
 ) else (
@@ -64,7 +64,7 @@ if %errorlevel% equ 0 (
 )
 
 echo Probando frontend...
-curl -f http://localhost:3000 2>nul
+curl -f http://localhost:3001 2>nul
 if %errorlevel% equ 0 (
     echo ✅ Frontend funcionando
 ) else (
@@ -76,8 +76,8 @@ echo ========================================
 echo    DESPLIEGUE COMPLETADO
 echo ========================================
 echo.
-echo 🌐 Frontend: http://localhost:3000
-echo 🔧 Backend API: http://localhost:3001
+echo 🌐 Frontend: http://localhost:3001
+echo 🔧 Backend API: http://localhost:9990
 echo 📊 Base de datos: SQLite en ./data/ambureview.db
 echo.
 echo Comandos utiles:

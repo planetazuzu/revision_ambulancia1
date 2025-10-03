@@ -55,8 +55,8 @@ show_success "Directorio de datos creado"
 show_info "Ejecutando contenedor..."
 docker run -d \
   --name ambureview-simple \
-  -p 3000:3000 \
   -p 3001:3001 \
+  -p 9990:9990 \
   -v "$(pwd)/data:/app/data" \
   ambureview-simple
 show_success "Contenedor ejecutándose"
@@ -69,14 +69,14 @@ docker ps | grep ambureview-simple
 
 show_info "Probando conectividad..."
 echo "Probando backend..."
-if curl -f http://localhost:3001/health >/dev/null 2>&1; then
+if curl -f http://localhost:9990/health >/dev/null 2>&1; then
     show_success "Backend funcionando"
 else
     show_error "Backend no responde"
 fi
 
 echo "Probando frontend..."
-if curl -f http://localhost:3000 >/dev/null 2>&1; then
+if curl -f http://localhost:3001 >/dev/null 2>&1; then
     show_success "Frontend funcionando"
 else
     show_error "Frontend no responde"
@@ -87,8 +87,8 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}    DESPLIEGUE COMPLETADO${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo
-echo -e "${GREEN}🌐 Frontend:${NC} http://localhost:3000"
-echo -e "${GREEN}🔧 Backend API:${NC} http://localhost:3001"
+echo -e "${GREEN}🌐 Frontend:${NC} http://localhost:3001"
+echo -e "${GREEN}🔧 Backend API:${NC} http://localhost:9990"
 echo -e "${GREEN}📊 Base de datos:${NC} SQLite en ./data/ambureview.db"
 echo
 echo -e "${YELLOW}Comandos útiles:${NC}"
