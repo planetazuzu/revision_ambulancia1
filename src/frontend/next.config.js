@@ -5,15 +5,16 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   },
-  async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${apiUrl}/:path*`,
-      },
-    ];
-  },
+  // Disable rewrites for Vercel deployment to avoid 404 issues
+  // async rewrites() {
+  //   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  //   return [
+  //     {
+  //       source: '/api/:path*',
+  //       destination: `${apiUrl}/:path*`,
+  //     },
+  //   ];
+  // },
   images: {
     remotePatterns: [
       {
