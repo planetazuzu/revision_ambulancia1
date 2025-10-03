@@ -94,7 +94,7 @@ fi
 
 # Crear directorios necesarios
 print_status "Creando directorios necesarios..."
-mkdir -p app/backend/uploads
+mkdir -p src/backend/uploads
 mkdir -p ops/ssl
 mkdir -p data/postgres
 mkdir -p data/redis
