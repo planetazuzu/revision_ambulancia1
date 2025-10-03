@@ -1,6 +1,28 @@
 # 🚑 AmbuReview - Sistema de Gestión de Ambulancias
 
-Sistema completo de gestión y revisión de ambulancias con backend NestJS, frontend Next.js y base de datos PostgreSQL.
+Sistema completo de gestión y revisión de ambulancias con **arquitectura monorepo**, backend NestJS, frontend Next.js y base de datos PostgreSQL.
+
+## 🏗️ Arquitectura Monorepo
+
+```
+revision_ambulancia-main/
+├── src/
+│   ├── frontend/          # Next.js Frontend
+│   ├── backend/           # NestJS Backend  
+│   └── shared/            # Tipos y utilidades compartidas
+├── .github/workflows/     # CI/CD con GitHub Actions
+├── docker-compose.yml     # Orquestación de contenedores
+└── package.json          # Workspaces configurados
+```
+
+## 🚀 CI/CD Pipeline
+
+- ✅ **Detección inteligente** de cambios en el monorepo
+- ✅ **Tests paralelos** para frontend y backend
+- ✅ **Build automático** de imágenes Docker
+- ✅ **Deploy automático** a producción
+- ✅ **Análisis de seguridad** continuo
+- ✅ **Actualizaciones automáticas** de dependencias
 
 ## 🎯 Características Principales
 
