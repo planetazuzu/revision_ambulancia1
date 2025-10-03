@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -32,7 +32,7 @@ RUN adduser --system --uid 1001 nestjs
 
 # Install only production dependencies
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production && npm cache clean --force
+RUN if [ -f package-lock.json ]; then npm ci --only=production; else npm install --only=production; fi && npm cache clean --force
 
 # Copy the built application
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist

@@ -60,12 +60,13 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://localhost:9990
+      - PORT=3001
     env_file:
       - env.port9990
     depends_on:
       - backend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       - ./app/frontend:/app
     restart: unless-stopped
