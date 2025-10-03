@@ -163,7 +163,7 @@ model ChecklistItem {
   label       String
   type        String // OKKO | NUMBER | TEXT | ATTACH
   required    Boolean @default(false)
-  "order"     Int     @default(0)
+  order       Int     @default(0) @map("order")
   category    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -265,6 +265,9 @@ model Space {
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Relations
+  materials AmpularioMaterial[]
   
   @@map("spaces")
 }
