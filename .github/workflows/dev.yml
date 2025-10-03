@@ -1,0 +1,148 @@
+name: 🧪 Development & Testing
+
+on:
+  push:
+    branches: [ develop, feature/* ]
+  pull_request:
+    branches: [ develop, main ]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # 🔍 Análisis de código
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install root dependencies
+        run: npm ci
+
+      - name: 📥 Install frontend dependencies
+        run: |
+          cd src/frontend
+          npm ci
+
+      - name: 📥 Install backend dependencies
+        run: |
+          cd src/backend
+          npm ci
+
+      - name: 🔍 Frontend linting
+        run: |
+          cd src/frontend
+          npm run lint --if-present
+
+      - name: 🔍 Backend linting
+        run: |
+          cd src/backend
+          npm run lint --if-present
+
+      - name: 🧪 Frontend tests
+        run: |
+          cd src/frontend
+          npm run test --if-present
+
+      - name: 🧪 Backend tests
+        run: |
+          cd src/backend
+          npm run test --if-present
+
+  # 🏗️ Build verification
+  build-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd src/frontend && npm ci
+          cd ../backend && npm ci
+
+      - name: 🏗️ Build frontend
+        run: |
+          cd src/frontend
+          npm run build
+
+      - name: 🏗️ Build backend
+        run: |
+          cd src/backend
+          npm run build
+
+  # 🐳 Docker build test
+  docker-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🏗️ Test frontend Docker build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src/frontend
+          push: false
+          tags: ambureview-frontend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🏗️ Test backend Docker build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src/backend
+          push: false
+          tags: ambureview-backend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # 📊 Coverage report
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          cd src/frontend && npm ci
+          cd ../backend && npm ci
+
+      - name: 🧪 Run tests with coverage
+        run: |
+          cd src/frontend
+          npm run test:coverage --if-present
+          cd ../backend
+          npm run test:coverage --if-present
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./src/frontend/coverage/lcov.info,./src/backend/coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false

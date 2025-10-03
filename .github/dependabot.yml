@@ -1,0 +1,81 @@
+version: 2
+updates:
+  # 📦 Root package.json
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "planetazuzu"
+    assignees:
+      - "planetazuzu"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # 🎨 Frontend dependencies
+  - package-ecosystem: "npm"
+    directory: "/src/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "planetazuzu"
+    assignees:
+      - "planetazuzu"
+    commit-message:
+      prefix: "chore(frontend)"
+      include: "scope"
+
+  # ⚙️ Backend dependencies
+  - package-ecosystem: "npm"
+    directory: "/src/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "planetazuzu"
+    assignees:
+      - "planetazuzu"
+    commit-message:
+      prefix: "chore(backend)"
+      include: "scope"
+
+  # 🐳 Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "planetazuzu"
+    assignees:
+      - "planetazuzu"
+    commit-message:
+      prefix: "chore(docker)"
+      include: "scope"
+
+  # 🔧 GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "planetazuzu"
+    assignees:
+      - "planetazuzu"
+    commit-message:
+      prefix: "chore(actions)"
+      include: "scope"
